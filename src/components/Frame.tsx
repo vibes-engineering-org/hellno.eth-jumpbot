@@ -45,10 +45,11 @@ export default function Frame() {
     let platforms: Platform[] = [];
     const platformCount = 7;
     const spacing = height / platformCount;
+    const initialY = player.y;
     for (let i = 0; i < platformCount; i++) {
       const pw = 80;
       const px = Math.random() * (width - pw);
-      const pyBase = height - i * spacing;
+      const pyBase = initialY - (i + 1) * spacing;
       const variation = (Math.random() - 0.5) * spacing * 0.6;
       const py = pyBase + variation;
       const speed = i === 0 ? 0 : (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
@@ -101,18 +102,22 @@ export default function Frame() {
       if (player.y < height * 0.4) {
         const dy = height * 0.4 - player.y;
         player.y = height * 0.4;
-        platforms = platforms
-          .map(p => ({ ...p, y: p.y + dy }))
-          .filter(p => p.y < height);
-        while (platforms.length < platformCount) {
+        // Shift and update positions
+        platforms = platforms.map(p => ({ ...p, y: p.y + dy }));
+        // Keep on-screen and last 10 below
+        const onScreenPlatforms = platforms.filter(p => p.y < height);
+        const offScreenPlatforms = platforms.filter(p => p.y >= height).slice(0, 10);
+        // Spawn new platforms above
+        while (onScreenPlatforms.length < platformCount) {
           const pw = 80;
           const px = Math.random() * (width - pw);
-          const pyBase = platforms[0].y - spacing;
+          const pyBase = onScreenPlatforms[0].y - spacing;
           const variation = (Math.random() - 0.5) * spacing * 0.6;
           const py = pyBase + variation;
           const speed = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
-          platforms.unshift({ x: px, y: py, width: pw, hazard: Math.random() < 0.2, speed });
+          onScreenPlatforms.unshift({ x: px, y: py, width: pw, hazard: Math.random() < 0.2, speed });
         }
+        platforms = [...onScreenPlatforms, ...offScreenPlatforms];
       }
 
       if (player.y > height) {
