@@ -6,6 +6,7 @@ type Platform = {
   y: number;
   width: number;
   hazard: boolean;
+  speed: number;
 };
 
 type Player = {
@@ -38,16 +39,20 @@ export default function Frame() {
       width: 30,
       height: 30,
       vx: 0,
-      vy: -10,
+      vy: -15,
     };
 
     let platforms: Platform[] = [];
     const platformCount = 7;
+    const spacing = height / platformCount;
     for (let i = 0; i < platformCount; i++) {
       const pw = 80;
       const px = Math.random() * (width - pw);
-      const py = height - i * (height / platformCount);
-      platforms.push({ x: px, y: py, width: pw, hazard: Math.random() < 0.2 });
+      const pyBase = height - i * spacing;
+      const variation = (Math.random() - 0.5) * spacing * 0.6;
+      const py = pyBase + variation;
+      const speed = i === 0 ? 0 : (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+      platforms.push({ x: px, y: py, width: pw, hazard: Math.random() < 0.2, speed });
     }
 
     function draw() {
@@ -79,11 +84,19 @@ export default function Frame() {
             if (p.hazard) {
               setGameOver(true);
             } else {
-              player.vy = -10;
+              player.vy = -15;
             }
           }
         });
       }
+
+      // move platforms horizontally
+      platforms.forEach(p => {
+        p.x += p.speed;
+        if (p.x <= 0 || p.x + p.width >= width) {
+          p.speed *= -1;
+        }
+      });
 
       if (player.y < height * 0.4) {
         const dy = height * 0.4 - player.y;
@@ -94,8 +107,11 @@ export default function Frame() {
         while (platforms.length < platformCount) {
           const pw = 80;
           const px = Math.random() * (width - pw);
-          const py = platforms[0].y - height / platformCount;
-          platforms.unshift({ x: px, y: py, width: pw, hazard: Math.random() < 0.2 });
+          const pyBase = platforms[0].y - spacing;
+          const variation = (Math.random() - 0.5) * spacing * 0.6;
+          const py = pyBase + variation;
+          const speed = (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
+          platforms.unshift({ x: px, y: py, width: pw, hazard: Math.random() < 0.2, speed });
         }
       }
 
