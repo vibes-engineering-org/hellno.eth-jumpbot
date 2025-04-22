@@ -125,11 +125,6 @@ export default function Frame() {
       draw();
       if (!gameOver) {
         requestAnimationFrame(loop);
-      } else {
-        ctx.fillStyle = "black";
-        ctx.font = "30px Arial";
-        ctx.fillText("Game Over", width / 2 - 70, height / 2);
-        ctx.fillText("Tap to Restart", width / 2 - 90, height / 2 + 40);
       }
     }
 
@@ -147,7 +142,6 @@ export default function Frame() {
     };
     const handleMouseUp = () => {
       player.vx = 0;
-      if (gameOver) window.location.reload();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -163,5 +157,33 @@ export default function Frame() {
     };
   }, [gameOver]);
 
-  return <canvas ref={canvasRef} style={{ display: "block" }} />;
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <canvas ref={canvasRef} style={{ display: "block" }} />
+      {gameOver && (
+        <div style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          color: "white",
+        }}>
+          <h1>Game Over</h1>
+          <button style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            cursor: "pointer",
+          }} onClick={() => setGameOver(false)}>
+            Retry
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
