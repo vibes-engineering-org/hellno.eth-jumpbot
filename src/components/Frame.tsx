@@ -53,7 +53,7 @@ export default function Frame() {
       const variation = (Math.random() - 0.5) * spacing * 0.6;
       const py = pyBase + variation;
       const speed = i === 0 ? 0 : (Math.random() * 2 + 1) * (Math.random() < 0.5 ? 1 : -1);
-      platforms.push({ x: px, y: py, width: pw, hazard: Math.random() < 0.2, speed });
+      platforms.push({ x: px, y: py, width: pw, hazard: i === 0 ? false : Math.random() < 0.2, speed });
     }
 
     function draw() {
@@ -106,7 +106,7 @@ export default function Frame() {
         platforms = platforms.map(p => ({ ...p, y: p.y + dy }));
         // Keep on-screen and last 10 below
         const onScreenPlatforms = platforms.filter(p => p.y < height);
-        const offScreenPlatforms = platforms.filter(p => p.y >= height).slice(0, 10);
+        const offScreenPlatforms = platforms.filter(p => p.y >= height).slice(-10);
         // Spawn new platforms above
         while (onScreenPlatforms.length < platformCount) {
           const pw = 80;
